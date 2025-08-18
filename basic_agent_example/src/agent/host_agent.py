@@ -11,17 +11,26 @@ class HostAgent:
     def __init__(self, client : LLM, system_prompt : str):
         self.client = client
         self.system_prompt = system_prompt
-        self.memory = []
+        self.memory = []  # Full memory for debugging
+        self.agent_memory = []  # Clean memory for agent
         self.tools = available_tools
         self.tool_schemas = tools
         self.goal = None
         if self.system_prompt is not None:
             self.memory.append({"role": "system", "content": self.system_prompt})
+            self.agent_memory.append({"role": "system", "content": self.system_prompt})
+    
+    def trace(self, tool_call):
+        """Convert tool call to plaintext description"""
+        function_name = tool_call.function.name
+        function_args = tool_call.function.arguments
+        return f"Called tool {function_name} with args {function_args}"
     
     def __call__(self, message=None):
         if message:
             logger.info(f"User message: {message}")
             self.memory.append({"role": "user", "content": message})
+            self.agent_memory.append({"role": "user", "content": message})
             # Extract and set goal from user's query
             self.goal = self.extract_goal(message)
             print(f"Goal: {self.goal}")
@@ -69,7 +78,7 @@ class HostAgent:
             "Respond as JSON only."
         )
 
-        messages = self._planner_messages() + [
+        messages = self.agent_memory + [
             {"role": "system", "content": planner_guard},
             {"role": "user", "content": think_prompt},
         ]
@@ -106,31 +115,33 @@ class HostAgent:
             )
 
         # Save a plain-text summary (no tool_calls)
-        self.memory.append({
-            "role": "assistant",
-            "content": (
-                f"Thought: {reasoning_obj.reasoning}\n"
-                f"Next Action: {reasoning_obj.next_action}\n"
-                f"Confidence: {reasoning_obj.confidence}"
-            )
-        })
+        thought_content = (
+            f"Thought: {reasoning_obj.reasoning}\n"
+            f"Next Action: {reasoning_obj.next_action}\n"
+            f"Confidence: {reasoning_obj.confidence}"
+        )
+        self.memory.append({"role": "assistant", "content": thought_content})
+        self.agent_memory.append({"role": "assistant", "content": thought_content})
         return reasoning_obj.reasoning
     
     def act(self):
         """Decide on and execute an action using tools"""
         completion = self.client.chat.completions.create(
             model=self.client.model,
-            messages=self.memory,
+            messages=self.agent_memory,
             tools=self.tool_schemas,
             tool_choice="auto",
         )
         
         response_message = completion.choices[0].message
         logger.info(f"Response message: {response_message}")
-        self.memory.append(response_message.model_dump())
         
         # Handle tool calls
         if response_message.tool_calls:
+            # Add raw tool call message to debug memory only
+            self.memory.append(response_message.model_dump())
+            # Build plaintext description of all tool calls and results
+            tool_descriptions = []
             for tool_call in response_message.tool_calls:
                 logger.info(f"Tool call: {tool_call}")
                 function_name = tool_call.function.name
@@ -156,8 +167,7 @@ class HostAgent:
                 
                 print(f"Observation: {result_str}")
                 
-                # Add tool response to memory
-                # Store structured result as JSON string if it's a dict
+                # Add tool response to debug memory
                 if isinstance(result, dict):
                     content = json.dumps(result)
                 else:
@@ -168,8 +178,23 @@ class HostAgent:
                     "tool_call_id": tool_call.id,
                     "content": content
                 })
+                
+                # Create plaintext description for agent memory
+                tool_desc = f"Called tool {function_name} with args {function_args} and got {content} as the output"
+                logger.info(f"Converted tool call {tool_call.id} to plaintext")
+                tool_descriptions.append(tool_desc)
+            
+            # Add combined tool descriptions to agent memory as assistant message
+            if tool_descriptions:
+                combined_desc = "\n".join(tool_descriptions)
+                self.agent_memory.append({"role": "assistant", "content": combined_desc})
             
             return True  # Tool was used
+        
+        # Final answer (no tool calls) - add to both memories
+        self.memory.append(response_message.model_dump())  # Full message to debug memory
+        if response_message.content:
+            self.agent_memory.append({"role": "assistant", "content": response_message.content})
         
         return response_message.content  # Final answer
     
@@ -186,12 +211,13 @@ class HostAgent:
             return self.execute()
         
         # Otherwise return the final answer
-        #print full memory
+        # Log both memories for debugging
+        logger.info("=== DEBUG MEMORY ===")
         for msg in self.memory:
-            logger.info(f"Memory message: {msg}")
-
-            #print cleaned memory
-        for msg in self._planner_messages():
-            logger.info(f"Cleaned memory message: {msg}")
+            logger.info(f"Debug memory: {msg}")
+        
+        logger.info("=== AGENT MEMORY ===")
+        for msg in self.agent_memory:
+            logger.info(f"Agent memory: {msg}")
 
         return result

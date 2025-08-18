@@ -3,7 +3,7 @@ from datetime import datetime
 
 def init_logging():
     """Simple logging setup - one file, fresh start each run"""
-    log_file_path = "/Users/natelevinson/Desktop/practice/restaurant_manager_good/logs/run.log"
+    log_file_path = "/Users/natelevinson/Desktop/practice/basic_agent_example/logs/run.log"
     
     # Remove default handler and add file handler with mode="w" for fresh start
     logger.remove()
