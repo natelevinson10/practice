@@ -3,8 +3,7 @@ from agent.llm import LLM
 from config.logging_creation import init_logging, log_startup
 from prompts.system_prompts import SYSTEM_PROMPT
 
-def loop(query: str = ""):
-
+def loop():
     # Initialize logging
     init_logging()
     log_startup()
@@ -12,13 +11,14 @@ def loop(query: str = ""):
     # Initialize agent
     agent = HostAgent(client=LLM(model="gpt-4o-mini"), system_prompt=SYSTEM_PROMPT)
 
-    # Get response from agent - it will handle tool calls automatically
-    result = agent(query)
-    
-    print("\nFinal Answer:")
-    print(result)
-    print("\nConversation history:")
-    print(agent.memory)
+    # Continuous loop
+    while True:
+        query = input("\n> ")
+        if query.lower() == 'quit':
+            break
+        
+        result = agent(query)
+        print(f"\nAnswer: {result}")
 
 
-loop(query="What is the mass of Earth plus the mass of Saturn and all of that times 2?")
+loop()

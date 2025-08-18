@@ -208,24 +208,25 @@ class HostAgent:
     
     def execute(self):
         """Execute the ReAct loop: Thought -> Action -> Observation"""
-        # Generate reasoning
-        self.think()
-        
-        # Take action (may involve tools)
-        result = self.act()
-        
-        # If tools were used, continue the loop
-        if result == True:
-            return self.execute()
-        
-        # Otherwise return the final answer
-        # Log both memories for debugging
-        logger.info("=== DEBUG MEMORY ===")
-        for msg in self.memory:
-            logger.info(f"Debug memory: {msg}")
-        
-        logger.info("=== AGENT MEMORY ===")
-        for msg in self.agent_memory:
-            logger.info(f"Agent memory: {msg}")
+        while True:
+            # Generate reasoning
+            self.think()
+            
+            # Take action (may involve tools)
+            result = self.act()
+            
+            # If tools were used, continue the loop
+            if result == True:
+                continue  # Keep looping
+            
+            # Otherwise we have the final answer
+            # Log both memories for debugging
+            logger.info("=== DEBUG MEMORY ===")
+            for msg in self.memory:
+                logger.info(f"Debug memory: {msg}")
+            
+            logger.info("=== AGENT MEMORY ===")
+            for msg in self.agent_memory:
+                logger.info(f"Agent memory: {msg}")
 
-        return result
+            return result  # Return final answer and exit loop
