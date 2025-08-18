@@ -1,7 +1,10 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
 
-class ThoughtResponse(BaseModel):    
+class ThoughtResponse(BaseModel):  
+    goal: str = Field(
+        description="The goal of the user's query"
+    )
     reasoning: str = Field(
         description="The reasoning for the next action"
     )

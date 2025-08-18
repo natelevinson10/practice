@@ -17,8 +17,13 @@ class HostAgent:
         self.tool_schemas = tools
         self.goal = None
         if self.system_prompt is not None:
-            self.memory.append({"role": "system", "content": self.system_prompt})
-            self.agent_memory.append({"role": "system", "content": self.system_prompt})
+            self.append_to_both_memories("system", self.system_prompt)
+    
+    def append_to_both_memories(self, role: str, content: str):
+        """Append a message to both memory and agent_memory"""
+        message = {"role": role, "content": content}
+        self.memory.append(message)
+        self.agent_memory.append(message)
     
     def trace(self, tool_call):
         """Convert tool call to plaintext description"""
@@ -29,10 +34,10 @@ class HostAgent:
     def __call__(self, message=None):
         if message:
             logger.info(f"User message: {message}")
-            self.memory.append({"role": "user", "content": message})
-            self.agent_memory.append({"role": "user", "content": message})
-            # Extract and set goal from user's query
-            self.goal = self.extract_goal(message)
+            self.append_to_both_memories("user", message)
+            # Extract and set goal from user's query (only on first message)
+            if self.goal is None:
+                self.goal = self.extract_goal(message)
             print(f"Goal: {self.goal}")
         result = self.execute()
         return result
@@ -63,6 +68,7 @@ class HostAgent:
                 {"role": "user", "content": user_query}
             ],
         )
+        logger.info(f"Extracted goal: {goal_completion.choices[0].message.content}")
         return goal_completion.choices[0].message.content
 
     def think(self):
@@ -70,7 +76,7 @@ class HostAgent:
         planner_guard = (
             "You are the planning module. Do NOT call tools. "
             "Reply ONLY with JSON that matches the ThoughtResponse schema. "
-            "Fields: reasoning (string), next_action (string), confidence (number 0-1)."
+            "Fields: goal (string), reasoning (string), next_action (string), confidence (number 0-1)."
         )
         think_prompt = (
             f"Current goal: {self.goal}\n"
@@ -85,10 +91,13 @@ class HostAgent:
 
         # Build JSON schema from ThoughtResponse (Pydantic v2 or v1)
         try:
-            schema_fn = getattr(ThoughtResponse, "model_json_schema", None) or ThoughtResponse.schema
+            schema_fn = getattr(ThoughtResponse, "model_json_schema", None) or ThoughtResponse
             json_schema = schema_fn()
         except Exception:
-            json_schema = ThoughtResponse.schema()
+            json_schema = ThoughtResponse
+        
+        # Hardcode the goal to always be self.goal
+        json_schema["properties"]["goal"]["const"] = self.goal
 
         # IMPORTANT: do NOT pass tool_choice or tools here
         completion = self.client.chat.completions.create(
@@ -109,6 +118,7 @@ class HostAgent:
             reasoning_obj = ThoughtResponse.model_validate(data)
         except Exception as e:
             reasoning_obj = ThoughtResponse(
+                goal=self.goal or "No goal set",
                 reasoning=f"Failed to parse strict JSON: {e}. Raw: {raw}",
                 next_action="re-evaluate-goal",
                 confidence=0.3,
@@ -116,12 +126,12 @@ class HostAgent:
 
         # Save a plain-text summary (no tool_calls)
         thought_content = (
+            f"Goal: {reasoning_obj.goal}\n"
             f"Thought: {reasoning_obj.reasoning}\n"
             f"Next Action: {reasoning_obj.next_action}\n"
             f"Confidence: {reasoning_obj.confidence}"
         )
-        self.memory.append({"role": "assistant", "content": thought_content})
-        self.agent_memory.append({"role": "assistant", "content": thought_content})
+        self.append_to_both_memories("assistant", thought_content)
         return reasoning_obj.reasoning
     
     def act(self):
@@ -191,7 +201,7 @@ class HostAgent:
             
             return True  # Tool was used
         
-        # Final answer (no tool calls) - add to both memories
+        # Final answer (no tool calls)
         self.memory.append(response_message.model_dump())  # Full message to debug memory
         if response_message.content:
             self.agent_memory.append({"role": "assistant", "content": response_message.content})
