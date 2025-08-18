@@ -1,0 +1,41 @@
+2025-08-16 23:15:49.758 | INFO     | config.logging:log_startup:9 - ================================================================================
+2025-08-16 23:15:49.758 | INFO     | config.logging:log_startup:10 - ⏰ Start time: 2025-08-16 23:15:49
+2025-08-16 23:15:49.758 | INFO     | config.logging:log_startup:11 - ================================================================================
+2025-08-16 23:15:54.583 | INFO     | __main__:run_react_workflow:184 - User input: Hey there tard
+
+2025-08-16 23:15:54.584 | INFO     | __main__:process_message_with_react:40 - Starting ReAct processing for: Hey there tard
+2025-08-16 23:15:56.059 | INFO     | __main__:process_message_with_react:118 - Agent response: Hello! How can I assist you with your flight reservations today? Whether you need to book a flight, ...
+2025-08-16 23:15:56.060 | INFO     | __main__:process_message_with_react:122 - Agent self-assessment: COMPLETE
+2025-08-16 23:15:56.060 | INFO     | __main__:process_message_with_react:125 - Task completed after 1 iterations
+2025-08-16 23:15:56.060 | INFO     | __main__:run_react_workflow:197 - User: Hey there tard
+2025-08-16 23:15:56.060 | INFO     | __main__:run_react_workflow:198 - Final Assistant Response: Hello! How can I assist you with your flight reservations today? Whether you need to book a flight, check availability, or manage any bookings, I'm here to help!
+2025-08-16 23:16:08.435 | INFO     | __main__:run_react_workflow:184 - User input: Please list all available flights
+
+2025-08-16 23:16:08.442 | INFO     | __main__:process_message_with_react:40 - Starting ReAct processing for: Please list all available flights
+2025-08-16 23:16:09.587 | INFO     | __main__:process_message_with_react:93 - Executing tool: get_flights_data with args: {}
+2025-08-16 23:16:09.587 | INFO     | tool_calls.tools:get_flights_data:50 - Calling get_flights_data
+2025-08-16 23:16:09.587 | INFO     | __main__:process_message_with_react:99 - Tool get_flights_data completed successfully
+2025-08-16 23:16:11.199 | INFO     | __main__:process_message_with_react:118 - Agent response: Here are the available flights you can book:
+
+1. **Flight Number:** DL456
+   - **Date:** 2025-09-04
+...
+2025-08-16 23:16:11.199 | INFO     | __main__:process_message_with_react:122 - Agent self-assessment: COMPLETE
+2025-08-16 23:16:11.199 | INFO     | __main__:process_message_with_react:125 - Task completed after 2 iterations
+2025-08-16 23:16:11.200 | INFO     | __main__:run_react_workflow:197 - User: Please list all available flights
+2025-08-16 23:16:11.200 | INFO     | __main__:run_react_workflow:198 - Final Assistant Response: Here are the available flights you can book:
+
+1. **Flight Number:** DL456
+   - **Date:** 2025-09-04
+   - **Time:** 14:30
+   - **Origin:** LAX (Los Angeles)
+   - **Destination:** NYC (New York)
+
+2. **Flight Number:** AA123
+   - **Date:** 2025-09-04
+   - **Time:** 10:00
+   - **Origin:** SEA (Seattle)
+   - **Destination:** PHL (Philadelphia)
+
+If you wish to book any of these flights or need further assistance, please let me know!
+2025-08-16 23:17:19.617 | INFO     | __main__:run_react_workflow:210 - Chat interrupted by user

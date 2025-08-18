@@ -1,0 +1,27 @@
+{
+  "available_flights": [
+    {
+      "flight_number": "DL456",
+      "date": "2025-09-04",
+      "time": "14:30",
+      "origin": "LAX",
+      "destination": "NYC"
+    },
+    {
+      "flight_number": "AA123",
+      "date": "2025-09-04",
+      "time": "10:00",
+      "origin": "SEA",
+      "destination": "PHL"
+    }
+  ],
+  "booked_flights": [
+    {
+      "flight_number": "AA126",
+      "date": "2025-09-04",
+      "time": "10:00",
+      "origin": "SFO",
+      "destination": "NYC"
+    }
+  ]
+}

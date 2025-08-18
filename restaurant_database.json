@@ -1,0 +1,122 @@
+{
+  "restaurant_info": {
+    "name": "The Golden Fork",
+    "opening_hours": {
+      "monday": "11:00-22:00",
+      "tuesday": "11:00-22:00",
+      "wednesday": "11:00-22:00",
+      "thursday": "11:00-22:00",
+      "friday": "11:00-23:00",
+      "saturday": "10:00-23:00",
+      "sunday": "10:00-21:00"
+    },
+    "capacity": 50,
+    "staff_on_duty": 8
+  },
+  "menu": {
+    "appetizers": [
+      {"id": "app001", "name": "Bruschetta", "price": 8.99, "available": true, "prep_time": 10},
+      {"id": "app002", "name": "Calamari", "price": 12.99, "available": true, "prep_time": 15},
+      {"id": "app003", "name": "Caesar Salad", "price": 9.99, "available": true, "prep_time": 8}
+    ],
+    "main_courses": [
+      {"id": "main001", "name": "Grilled Salmon", "price": 24.99, "available": true, "prep_time": 20},
+      {"id": "main002", "name": "Ribeye Steak", "price": 32.99, "available": true, "prep_time": 25},
+      {"id": "main003", "name": "Chicken Alfredo", "price": 18.99, "available": true, "prep_time": 18},
+      {"id": "main004", "name": "Vegetarian Pasta", "price": 16.99, "available": true, "prep_time": 15}
+    ],
+    "desserts": [
+      {"id": "des001", "name": "Tiramisu", "price": 7.99, "available": true, "prep_time": 5},
+      {"id": "des002", "name": "Chocolate Lava Cake", "price": 8.99, "available": false, "prep_time": 12},
+      {"id": "des003", "name": "Cheesecake", "price": 6.99, "available": true, "prep_time": 5}
+    ],
+    "beverages": [
+      {"id": "bev001", "name": "Soft Drinks", "price": 2.99, "available": true, "prep_time": 1},
+      {"id": "bev002", "name": "Coffee", "price": 3.99, "available": true, "prep_time": 3},
+      {"id": "bev003", "name": "Wine (Glass)", "price": 8.99, "available": true, "prep_time": 1}
+    ]
+  },
+  "tables": [
+    {"id": 1, "capacity": 2, "status": "available", "location": "window"},
+    {"id": 2, "capacity": 2, "status": "occupied", "location": "window", "order_id": "ORD001"},
+    {"id": 3, "capacity": 4, "status": "available", "location": "center"},
+    {"id": 4, "capacity": 4, "status": "reserved", "location": "center", "reservation_id": "RES001"},
+    {"id": 5, "capacity": 6, "status": "available", "location": "corner"},
+    {"id": 6, "capacity": 6, "status": "occupied", "location": "patio", "order_id": "ORD002"},
+    {"id": 7, "capacity": 2, "status": "available", "location": "bar"},
+    {"id": 8, "capacity": 4, "status": "available", "location": "patio"}
+  ],
+  "reservations": [
+    {
+      "id": "RES001",
+      "customer_name": "John Smith",
+      "phone": "555-0101",
+      "table_id": 4,
+      "party_size": 4,
+      "date": "2024-03-15",
+      "time": "19:00",
+      "status": "confirmed",
+      "special_requests": "Anniversary dinner"
+    },
+    {
+      "id": "RES002",
+      "customer_name": "Emily Davis",
+      "phone": "555-0102",
+      "table_id": null,
+      "party_size": 2,
+      "date": "2024-03-15",
+      "time": "20:00",
+      "status": "pending",
+      "special_requests": "Vegetarian options preferred"
+    }
+  ],
+  "waitlist": [
+    {
+      "id": "WAIT001",
+      "customer_name": "Robert Johnson",
+      "phone": "555-0103",
+      "party_size": 3,
+      "estimated_wait": 30,
+      "timestamp": "2024-03-15T18:30:00",
+      "status": "waiting"
+    }
+  ],
+  "active_orders": [
+    {
+      "id": "ORD001",
+      "table_id": 2,
+      "items": [
+        {"item_id": "app001", "quantity": 2, "status": "served"},
+        {"item_id": "main001", "quantity": 1, "status": "preparing"},
+        {"item_id": "main003", "quantity": 1, "status": "preparing"}
+      ],
+      "status": "in_progress",
+      "total": 52.97,
+      "timestamp": "2024-03-15T18:15:00"
+    },
+    {
+      "id": "ORD002",
+      "table_id": 6,
+      "items": [
+        {"item_id": "app002", "quantity": 1, "status": "served"},
+        {"item_id": "main002", "quantity": 2, "status": "served"},
+        {"item_id": "des001", "quantity": 2, "status": "pending"}
+      ],
+      "status": "in_progress",
+      "total": 94.95,
+      "timestamp": "2024-03-15T17:45:00"
+    }
+  ],
+  "inventory_alerts": [
+    {
+      "item": "Chocolate Lava Cake",
+      "status": "out_of_stock",
+      "alert_level": "high"
+    },
+    {
+      "item": "Wine",
+      "status": "low_stock",
+      "alert_level": "medium"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+2025-08-16 23:17:27.555 | INFO     | config.logging:log_startup:9 - ================================================================================
+2025-08-16 23:17:27.556 | INFO     | config.logging:log_startup:10 - ⏰ Start time: 2025-08-16 23:17:27
+2025-08-16 23:17:27.556 | INFO     | config.logging:log_startup:11 - ================================================================================
+2025-08-16 23:17:37.808 | INFO     | __main__:run_react_workflow:184 - User input: Hey can you [please list all flights available
+
+2025-08-16 23:17:37.810 | INFO     | __main__:process_message_with_react:40 - Starting ReAct processing for: Hey can you [please list all flights available
+2025-08-16 23:17:39.476 | INFO     | __main__:process_message_with_react:93 - Executing tool: get_flights_data with args: {}
+2025-08-16 23:17:39.476 | INFO     | tool_calls.tools:get_flights_data:50 - Calling get_flights_data
+2025-08-16 23:17:39.477 | INFO     | __main__:process_message_with_react:99 - Tool get_flights_data completed successfully
+2025-08-16 23:17:41.310 | INFO     | __main__:process_message_with_react:118 - Agent response: Here are the available flights you can book:
+
+1. **Flight Number:** DL456
+   - **Date:** 2025-09-04
+...
+2025-08-16 23:17:41.310 | INFO     | __main__:process_message_with_react:122 - Agent self-assessment: COMPLETE
+2025-08-16 23:17:41.310 | INFO     | __main__:process_message_with_react:125 - Task completed after 2 iterations
+2025-08-16 23:17:41.310 | INFO     | __main__:run_react_workflow:197 - User: Hey can you [please list all flights available
+2025-08-16 23:17:41.311 | INFO     | __main__:run_react_workflow:198 - Final Assistant Response: Here are the available flights you can book:
+
+1. **Flight Number:** DL456
+   - **Date:** 2025-09-04
+   - **Time:** 14:30
+   - **Origin:** LAX
+   - **Destination:** NYC
+
+2. **Flight Number:** AA123
+   - **Date:** 2025-09-04
+   - **Time:** 10:00
+   - **Origin:** SEA
+   - **Destination:** PHL
+
+These flights are currently available for booking.
