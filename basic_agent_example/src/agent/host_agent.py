@@ -35,8 +35,8 @@ class HostAgent:
             logger.info(f"User message: {message}")
             self.append_to_both_memories("user", message)
             # Extract and set goal from user's query (only on first message)
-            if self.goal is None:
-                self.goal = self.extract_goal(message)
+            logger.info(f"Extracting goal from user's query")
+            self.goal = self.extract_goal(message)
             print(f"Goal: {self.goal}")
         result = self.execute()
         return result
