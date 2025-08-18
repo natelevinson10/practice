@@ -25,11 +25,10 @@ class HostAgent:
         self.memory.append(message)
         self.agent_memory.append(message)
     
-    def trace(self, tool_call):
-        """Convert tool call to plaintext description"""
-        function_name = tool_call.function.name
-        function_args = tool_call.function.arguments
-        return f"Called tool {function_name} with args {function_args}"
+    def trace(self, tool_call_id, function_name, function_args, content):
+        """Convert tool call and result to plaintext description"""
+        logger.info(f"Converted tool call {tool_call_id} to plaintext")
+        return f"Called tool {function_name} with args {function_args} and got {content} as the output"
     
     def __call__(self, message=None):
         if message:
@@ -189,9 +188,8 @@ class HostAgent:
                     "content": content
                 })
                 
-                # Create plaintext description for agent memory
-                tool_desc = f"Called tool {function_name} with args {function_args} and got {content} as the output"
-                logger.info(f"Converted tool call {tool_call.id} to plaintext")
+                # Create plaintext description for agent memory using trace method
+                tool_desc = self.trace(tool_call.id, function_name, function_args, content)
                 tool_descriptions.append(tool_desc)
             
             # Add combined tool descriptions to agent memory as assistant message
