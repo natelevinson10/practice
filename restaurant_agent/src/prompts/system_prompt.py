@@ -16,17 +16,3 @@ You will field customers questions and answer them.
 - If the user asks about something that is not relevant to your duties as a host, politely decline to answer.
 - Do not include any other information that is not the answer to the user's question.
 """
-
-GOAL_PROMPT = """
-Convert the user's query into a clear, specific goal statement. Be concise and action-oriented. NEVER include any information that is not relevant to the user's question.
-
-Example:
-User: What is the name of your restaurant?
-Goal: Provide the name of your restaurant.
-
-User: What is the most expensive item on the menu?
-Goal: Provide the most expensive item on the menu.
-
-User: Do you have a table for 4 people available?
-Goal: Check if there is a table for 4 people available.
-"""

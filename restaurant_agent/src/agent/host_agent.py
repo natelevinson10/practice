@@ -7,7 +7,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 from models.schemas import ThoughtResponse
 from ..tools.tools import available_tools, tools
 import time
-from src.prompts.system_prompt import GOAL_PROMPT
 
 class HostAgent:
     def __init__(self, client: LLM, system_prompt: str):
@@ -17,7 +16,7 @@ class HostAgent:
         self.agent_memory = []  # Clean memory for agent
         self.tools = available_tools
         self.tool_schemas = tools
-        self.goal = None
+        self.user_query = None
         if self.system_prompt is not None:
             self.append_to_both_memories("system", self.system_prompt)
     
@@ -37,40 +36,28 @@ class HostAgent:
         if message:
             logger.info(f"User message: {message}")
             self.append_to_both_memories("user", message)
-            # Extract and set goal from user's query (only on first message)
-            logger.info(f"Extracting goal from user's query")
-            self.goal = self._extract_goal(message)
-            print(f"Goal: {self.goal}")
+            self.user_query = message
         result = self.execute()
         return result
-    
-    def _extract_goal(self, user_query):
-        """Extract a clear, actionable goal from the user's query"""
-        goal_completion = self.client.chat.completions.create(
-            model=self.client.model,
-            messages=[
-                {"role": "system", "content": GOAL_PROMPT},
-                {"role": "user", "content": user_query}
-            ],
-        )
-        logger.info(f"Extracted goal: {goal_completion.choices[0].message.content}")
-        return goal_completion.choices[0].message.content
     
     def think(self):
         start_time = time.time()
         logger.info("=== THINKING ===")
         """Plan next step with structured output; no tool calls allowed."""
         planner_guard = (
-            "You are the planning module. Do NOT call tools. "
-            "Reply ONLY with JSON that matches the ThoughtResponse schema. "
-            "Fields: goal (string), thought (string), next_action (string), confidence (number 0-1)."
+            "You are the planning module. Do NOT call tools."
+            "Reply ONLY with JSON that matches the ThoughtResponse schema."
+            "Keep your 'thought' short and concise"
+            "Fields: user_query (string), thought (string), next_action (string), answer (optional string), confidence (number 0-1).\n"
+            "If you can answer WITHOUT tools, set next_action='provide_answer' and include the answer field.\n"
+            "If you need tools, set next_action to the tool name (e.g., 'get_restaurant_info').\n"
             "IMPORTANT: Check if information is already available in the conversation history "
-            "or system prompt before deciding to call tools. For example, if you recently called get_restaurant_info, "
+            "before deciding to call tools. If you recently called get_restaurant_info, "
             "that data contains ALL restaurant information - reuse it instead of calling again."
         )
         think_prompt = (
-            f"Current goal: {self.goal}\n"
-            "Have I completed the goal? If not, what's the single next step?\n"
+            f"User's query: {self.user_query}\n"
+            "Can I answer with available info? If yes, provide the answer. If not, what tool is needed?\n"
             "Respond as JSON only."
         )
 
@@ -86,8 +73,8 @@ class HostAgent:
         except Exception:
             json_schema = ThoughtResponse
         
-        # Hardcode the goal to always be self.goal
-        json_schema["properties"]["goal"]["const"] = self.goal
+        # Hardcode the user_query to always be self.user_query
+        json_schema["properties"]["user_query"]["const"] = self.user_query
 
         # IMPORTANT: do NOT pass tool_choice or tools here
         completion = self.client.chat.completions.create(
@@ -108,22 +95,27 @@ class HostAgent:
             reasoning_obj = ThoughtResponse.model_validate(data)
         except Exception as e:
             reasoning_obj = ThoughtResponse(
-                goal=self.goal or "No goal set",
+                user_query=self.user_query or "No user_query set",
                 thought=f"Failed to parse strict JSON: {e}. Raw: {raw}",
-                next_action="re-evaluate-goal",
+                next_action="re-evaluate-user_query",
+                answer=None,
                 confidence=0.3,
             )
 
         # Save a plain-text summary (no tool_calls)
         thought_content = (
-            f"Goal: {reasoning_obj.goal}\n"
+            f"User's query: {self.user_query}\n"
             f"Thought: {reasoning_obj.thought}\n"
             f"Next Action: {reasoning_obj.next_action}\n"
+            f"Answer: {reasoning_obj.answer}\n"
             f"Confidence: {reasoning_obj.confidence}"
         )
-        logger.info(f"Thought for {time.time() - start_time} seconds: \n Goal: {reasoning_obj.goal} \n Thought: {reasoning_obj.thought} \n Next Action: {reasoning_obj.next_action} \n Confidence: {reasoning_obj.confidence}")
+        print(f"\n \033[90mThought: {reasoning_obj.thought}\033[0m")
+        if reasoning_obj.answer:
+            thought_content += f"\nAnswer: {reasoning_obj.answer}"
+        logger.info(f"Thought for {time.time() - start_time} seconds: \n User's query: {self.user_query} \n Thought: {reasoning_obj.thought} \n Next Action: {reasoning_obj.next_action} \n Answer: {reasoning_obj.answer} \n Confidence: {reasoning_obj.confidence}")
         self.append_to_both_memories("assistant", "THOUGHT: " + thought_content)
-        return reasoning_obj.thought
+        return reasoning_obj
     
     def act(self):
         start_time = time.time()
@@ -150,7 +142,7 @@ class HostAgent:
                 function_name = tool_call.function.name
                 function_args = json.loads(tool_call.function.arguments)
                 
-                print(f"Action: {function_name}({function_args})")
+                print(f"\n \033[90mCalling {function_name}...\033[0m")
                 
                 # Execute the tool
                 if function_name in self.tools:
@@ -167,8 +159,6 @@ class HostAgent:
                 else:
                     result = "Tool not found"
                     result_str = result
-                
-                print(f"Observation: {result_str}")
                 
                 # Add tool response to debug memory
                 if isinstance(result, dict):
@@ -202,14 +192,30 @@ class HostAgent:
         return response_message.content  # Final answer
 
     def observe(self):
-        """Observe the previous action and the result of the action"""
+        """Observe the previous thought and action and the result of the action ti """
         pass
     
     def execute(self):
         """Execute the ReAct loop: Thought -> Action -> Observation"""
         while True:
             # Generate reasoning
-            self.think()
+            reasoning = self.think()
+            
+            # If thinking provided a direct answer, return it without calling act()
+            if reasoning.next_action == "provide_answer" and reasoning.answer:
+                logger.info(f"Direct answer provided: {reasoning.answer}")
+                self.append_to_both_memories("assistant", reasoning.answer)
+                
+                # Log both memories for debugging
+                logger.info("=== DEBUG MEMORY ===")
+                for msg in self.memory:
+                    logger.info(f"Debug memory: {msg}")
+                
+                logger.info("=== AGENT MEMORY ===")
+                for msg in self.agent_memory:
+                    logger.info(f"Agent memory: {msg}")
+                
+                return reasoning.answer
             
             # Take action (may involve tools)
             result = self.act()
