@@ -112,6 +112,7 @@ class HostAgent:
         )
         print(f"\n \033[90mThought: {reasoning_obj.thought}\033[0m")
         if reasoning_obj.answer:
+            print(f"\n \033[90mAnswer Identified. Returning... \033[0m")
             thought_content += f"\nAnswer: {reasoning_obj.answer}"
         logger.info(f"Thought for {time.time() - start_time} seconds: \n User's query: {self.user_query} \n Thought: {reasoning_obj.thought} \n Next Action: {reasoning_obj.next_action} \n Answer: {reasoning_obj.answer} \n Confidence: {reasoning_obj.confidence}")
         self.append_to_both_memories("assistant", "THOUGHT: " + thought_content)

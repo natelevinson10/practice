@@ -118,5 +118,19 @@
       "status": "low_stock",
       "alert_level": "medium"
     }
+  ],
+  "table_bill": [
+    {
+      "id": "BILL001",
+      "table_id": 2,
+      "items": [
+        {"item_id": "app001", "quantity": 2, "status": "served"},
+        {"item_id": "main001", "quantity": 1, "status": "preparing"},
+        {"item_id": "main003", "quantity": 1, "status": "preparing"}
+      ],
+      "status": "in_progress",
+      "total": 52.97,
+      "timestamp": "2024-03-15T18:15:00"
+    }
   ]
 }
