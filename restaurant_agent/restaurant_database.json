@@ -15,36 +15,157 @@
   },
   "menu": {
     "appetizers": [
-      {"id": "app001", "name": "Bruschetta", "price": 8.99, "available": true, "prep_time": 10},
-      {"id": "app002", "name": "Calamari", "price": 12.99, "available": true, "prep_time": 15},
-      {"id": "app003", "name": "Caesar Salad", "price": 9.99, "available": true, "prep_time": 8}
+      {
+        "id": "app001",
+        "name": "Bruschetta",
+        "price": 8.99,
+        "available": true,
+        "prep_time": 10
+      },
+      {
+        "id": "app002",
+        "name": "Calamari",
+        "price": 12.99,
+        "available": true,
+        "prep_time": 15
+      },
+      {
+        "id": "app003",
+        "name": "Caesar Salad",
+        "price": 9.99,
+        "available": true,
+        "prep_time": 8
+      }
     ],
     "main_courses": [
-      {"id": "main001", "name": "Grilled Salmon", "price": 24.99, "available": true, "prep_time": 20},
-      {"id": "main002", "name": "Ribeye Steak", "price": 32.99, "available": true, "prep_time": 25},
-      {"id": "main003", "name": "Chicken Alfredo", "price": 18.99, "available": true, "prep_time": 18},
-      {"id": "main004", "name": "Vegetarian Pasta", "price": 16.99, "available": true, "prep_time": 15}
+      {
+        "id": "main001",
+        "name": "Grilled Salmon",
+        "price": 24.99,
+        "available": true,
+        "prep_time": 20
+      },
+      {
+        "id": "main002",
+        "name": "Ribeye Steak",
+        "price": 32.99,
+        "available": true,
+        "prep_time": 25
+      },
+      {
+        "id": "main003",
+        "name": "Chicken Alfredo",
+        "price": 18.99,
+        "available": true,
+        "prep_time": 18
+      },
+      {
+        "id": "main004",
+        "name": "Vegetarian Pasta",
+        "price": 16.99,
+        "available": true,
+        "prep_time": 15
+      }
     ],
     "desserts": [
-      {"id": "des001", "name": "Tiramisu", "price": 7.99, "available": true, "prep_time": 5},
-      {"id": "des002", "name": "Chocolate Lava Cake", "price": 8.99, "available": false, "prep_time": 12},
-      {"id": "des003", "name": "Cheesecake", "price": 6.99, "available": true, "prep_time": 5}
+      {
+        "id": "des001",
+        "name": "Tiramisu",
+        "price": 7.99,
+        "available": true,
+        "prep_time": 5
+      },
+      {
+        "id": "des002",
+        "name": "Chocolate Lava Cake",
+        "price": 8.99,
+        "available": false,
+        "prep_time": 12
+      },
+      {
+        "id": "des003",
+        "name": "Cheesecake",
+        "price": 6.99,
+        "available": true,
+        "prep_time": 5
+      }
     ],
     "beverages": [
-      {"id": "bev001", "name": "Soft Drinks", "price": 2.99, "available": true, "prep_time": 1},
-      {"id": "bev002", "name": "Coffee", "price": 3.99, "available": true, "prep_time": 3},
-      {"id": "bev003", "name": "Wine (Glass)", "price": 8.99, "available": true, "prep_time": 1}
+      {
+        "id": "bev001",
+        "name": "Soft Drinks",
+        "price": 2.99,
+        "available": true,
+        "prep_time": 1
+      },
+      {
+        "id": "bev002",
+        "name": "Coffee",
+        "price": 3.99,
+        "available": true,
+        "prep_time": 3
+      },
+      {
+        "id": "bev003",
+        "name": "Wine (Glass)",
+        "price": 8.99,
+        "available": true,
+        "prep_time": 1
+      }
     ]
   },
   "tables": [
-    {"id": 1, "capacity": 2, "status": "available", "location": "window"},
-    {"id": 2, "capacity": 2, "status": "occupied", "location": "window", "order_id": "ORD001"},
-    {"id": 3, "capacity": 4, "status": "available", "location": "center"},
-    {"id": 4, "capacity": 4, "status": "reserved", "location": "center", "reservation_id": "RES001"},
-    {"id": 5, "capacity": 6, "status": "available", "location": "corner"},
-    {"id": 6, "capacity": 6, "status": "occupied", "location": "patio", "order_id": "ORD002"},
-    {"id": 7, "capacity": 2, "status": "available", "location": "bar"},
-    {"id": 8, "capacity": 4, "status": "available", "location": "patio"}
+    {
+      "id": 1,
+      "capacity": 2,
+      "status": "available",
+      "location": "window"
+    },
+    {
+      "id": 2,
+      "capacity": 2,
+      "status": "occupied",
+      "location": "window",
+      "order_id": "ORD001"
+    },
+    {
+      "id": 3,
+      "capacity": 4,
+      "status": "available",
+      "location": "center"
+    },
+    {
+      "id": 4,
+      "capacity": 4,
+      "status": "reserved",
+      "location": "center",
+      "reservation_id": "RES001"
+    },
+    {
+      "id": 5,
+      "capacity": 6,
+      "status": "available",
+      "location": "corner"
+    },
+    {
+      "id": 6,
+      "capacity": 6,
+      "status": "occupied",
+      "location": "patio",
+      "order_id": "ORD002"
+    },
+    {
+      "id": 7,
+      "capacity": 2,
+      "status": "reserved",
+      "location": "bar"
+    },
+    {
+      "id": 8,
+      "capacity": 4,
+      "status": "available",
+      "location": "patio"
+    }
   ],
   "reservations": [
     {
@@ -68,6 +189,17 @@
       "time": "20:00",
       "status": "pending",
       "special_requests": "Vegetarian options preferred"
+    },
+    {
+      "id": "RESD9GT85",
+      "customer_name": "Nate Smith",
+      "phone": "610-888-5080",
+      "table_id": 7,
+      "party_size": 2,
+      "date": "2025-08-20",
+      "time": "19:00",
+      "status": "confirmed",
+      "special_requests": ""
     }
   ],
   "waitlist": [
@@ -86,9 +218,21 @@
       "id": "ORD001",
       "table_id": 2,
       "items": [
-        {"item_id": "app001", "quantity": 2, "status": "served"},
-        {"item_id": "main001", "quantity": 1, "status": "preparing"},
-        {"item_id": "main003", "quantity": 1, "status": "preparing"}
+        {
+          "item_id": "app001",
+          "quantity": 2,
+          "status": "served"
+        },
+        {
+          "item_id": "main001",
+          "quantity": 1,
+          "status": "preparing"
+        },
+        {
+          "item_id": "main003",
+          "quantity": 1,
+          "status": "preparing"
+        }
       ],
       "status": "in_progress",
       "total": 52.97,
@@ -98,9 +242,21 @@
       "id": "ORD002",
       "table_id": 6,
       "items": [
-        {"item_id": "app002", "quantity": 1, "status": "served"},
-        {"item_id": "main002", "quantity": 2, "status": "served"},
-        {"item_id": "des001", "quantity": 2, "status": "pending"}
+        {
+          "item_id": "app002",
+          "quantity": 1,
+          "status": "served"
+        },
+        {
+          "item_id": "main002",
+          "quantity": 2,
+          "status": "served"
+        },
+        {
+          "item_id": "des001",
+          "quantity": 2,
+          "status": "pending"
+        }
       ],
       "status": "in_progress",
       "total": 94.95,
@@ -124,9 +280,21 @@
       "id": "BILL001",
       "table_id": 2,
       "items": [
-        {"item_id": "app001", "quantity": 2, "status": "served"},
-        {"item_id": "main001", "quantity": 1, "status": "preparing"},
-        {"item_id": "main003", "quantity": 1, "status": "preparing"}
+        {
+          "item_id": "app001",
+          "quantity": 2,
+          "status": "served"
+        },
+        {
+          "item_id": "main001",
+          "quantity": 1,
+          "status": "preparing"
+        },
+        {
+          "item_id": "main003",
+          "quantity": 1,
+          "status": "preparing"
+        }
       ],
       "status": "in_progress",
       "total": 52.97,
