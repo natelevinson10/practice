@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 from agents import function_tool
 from rich.console import Console
+from loguru import logger
 
 load_dotenv()
 console = Console()
@@ -21,6 +22,9 @@ def rag_search(query: str) -> list:
     Returns:
         A list of relevant text chunks from the knowledge base
     """
+    # Log the tool call with the query being searched
+    logger.info(f"RAG_SEARCH TOOL CALLED - Query: '{query}'")
+    
     # Display the query being run
     console.print(f"[bright_black]Running query: {query}[/bright_black]")
     
@@ -75,5 +79,7 @@ def rag_search(query: str) -> list:
 
     for result in obj["search_results"]:
         chunks.append(result["text"])
+    
+    logger.info(f"RAG_SEARCH TOOL COMPLETED - Found {len(chunks)} chunks for query: '{query}'")
     
     return chunks

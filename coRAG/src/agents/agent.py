@@ -37,13 +37,6 @@ class ResearcherAgent:
         self.memory.append(response_message)
 
         if response_message.tool_calls:
-
-            #print all queries (args for search)
-            for tool_call in response_message.tool_calls:
-                if tool_call.function.name == "rag_search":
-                    function_args = json.loads(tool_call.function.arguments)
-                    console.print(f"[bright_black]Running query: {function_args['query']}[/bright_black]")
-
             logger.info(f"TOOL CALLS: {response_message.tool_calls}")
 
             # Execute tool calls
@@ -83,14 +76,36 @@ class EvaluatorAgent:
     def __init__(self, client: OpenAI, system_prompt: str):
         self.client = client
         self.system_prompt = system_prompt
-        self.memory = []
-        if self.system_prompt is not None:
-            self.memory.append({"role": "system", "content": self.system_prompt})
     
-    def __call__(self, message=None):
-        if message:
-            self.memory.append({"role": "user", "content": message})
-        return self.client.chat.completions.create(
+    def evaluate(self, initial_query: str, synthesized_response: str) -> dict:
+        """
+        Evaluate if the synthesized response fully answers the initial query.
+        Returns a dict with 'fully_answered' (bool) and 'reason' (str).
+        """
+        # The EVALUATOR_PROMPT already instructs to return JSON, just provide the data
+        evaluation_message = f"""
+Initial Query: {initial_query}
+
+Synthesized Response: {synthesized_response}
+"""
+        
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": evaluation_message}
+        ]
+        
+        response = self.client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=self.memory,
-            stream=False).choices[0].message
+            messages=messages,
+            stream=False,
+            response_format={"type": "json_object"}
+        ).choices[0].message
+        
+        try:
+            result = json.loads(response.content)
+            # Normalize the response to boolean
+            result['fully_answered'] = result.get('fully_answered', 'NO').upper() == 'YES'
+            return result
+        except json.JSONDecodeError:
+            logger.error(f"Failed to parse evaluator response: {response.content}")
+            return {"fully_answered": False, "reason": "Failed to parse evaluation response"}

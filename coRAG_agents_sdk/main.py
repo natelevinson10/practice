@@ -1,12 +1,11 @@
-from src.agents.agent import create_researcher_agent
-from src.prompts.system_prompts import RESEARCHER_PROMPT
+from src.agents.orchestrator import CoRAGOrchestratorSDK
 from src.config.init_logging import init_logging, log_startup
-from agents import Runner
 from dotenv import load_dotenv
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.markdown import Markdown
-from loguru import logger
+from rich.panel import Panel
+from rich.text import Text
 
 load_dotenv()
 console = Console()
@@ -16,32 +15,50 @@ def main():
     init_logging()
     log_startup()
 
-    console.print("[bold green]coRAG tester (OpenAI Agents SDK)[/bold green]\n")
-    user_input = Prompt.ask("[bold green]Enter your query[/bold green]")
+    console.print(Panel(
+        "[bold green]coRAG (OpenAI Agents SDK)[/bold green]\n" +
+        "Research → Evaluate → Retry if needed",
+        expand=False
+    ))
     
-    # Create the agent with the researcher prompt
-    agent = create_researcher_agent(RESEARCHER_PROMPT)
-
-    # Run the agent synchronously
-    result = Runner.run_sync(agent, user_input)
-
-    # Display the result
-    console.print(Markdown(result.final_output))
-
-    # Log full conversation memory with structured details
-    logger.info("Conversation Memory:")
-    for i, message in enumerate(result.new_items, 1):
-        
-        # Log to file with structured details
-        if hasattr(message, 'role'):
-            if message.role == 'user':
-                logger.info(f"User ({i}): {message.content}")
-            elif message.role == 'assistant':
-                logger.info(f"Assistant ({i}): {message.content[:200]}...")
-            elif message.role == 'tool':
-                logger.info(f"Tool Call ({i}): {getattr(message, 'name', 'unknown')}")
-        else:
-            logger.info(f"Message {i}: {str(message)[:100]}...")
+    user_input = Prompt.ask("\n[bold green]Enter your query[/bold green]")
+    
+    # Initialize the orchestrator with max 3 retries
+    orchestrator = CoRAGOrchestratorSDK(max_retries=3)
+    
+    # Run the research-evaluate loop
+    result = orchestrator.run(user_input)
+    
+    # Display final result
+    console.print("\n" + "="*60)
+    if result['success']:
+        # Extract just the final synthesis for the final answer
+        final_answer = result['answer']
+        if "Final Synthesis" in final_answer:
+            parts = final_answer.split("Final Synthesis")
+        if len(parts) > 1:
+            synthesis = parts[1].strip()
+            # Clean up markdown formatting
+            if synthesis.startswith("**"):
+                synthesis = synthesis[2:].strip()
+            if synthesis.startswith("-"):
+                synthesis = synthesis[1:].strip()
+            final_answer = synthesis
+    
+        console.print(Panel(
+        Markdown(final_answer),
+        title=f"[bold green]✓ Final Answer (Attempt {result['attempts']})[/bold green]",
+        border_style="green"
+        ))
+    else:
+        console.print(Panel(
+        Text("Failed to get a satisfactory answer after maximum retries.", style="bold red"),
+        title="[bold red]✗ Failed[/bold red]",
+        border_style="red"
+        ))
+        if result['answer']:
+            console.print("\n[yellow]Last response:[/yellow]")
+            console.print(Markdown(result['answer']))
 
 if __name__ == "__main__":
-    main()
+  main()

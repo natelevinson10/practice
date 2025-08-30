@@ -2,11 +2,21 @@ import requests
 import json
 from dotenv import load_dotenv
 import os
+from loguru import logger
+from rich.console import Console
+
 load_dotenv()
+console = Console()
 
 
 def rag_search(query: str):
     """Execute a RAG search using Vectara API"""
+
+    logger.info(f"RAG SEARCH TOOL CALLED FOR QUERY: {query}")
+    
+    # Display the query being run in grey
+    console.print(f"[bright_black]Running subquery: {query}[/bright_black]")
+    
     url = "https://api.vectara.io/v2/chats"
 
     headers = {
@@ -57,7 +67,8 @@ def rag_search(query: str):
     chunks = []
 
     for _ in obj["search_results"]:
-        chunks.append(_["text"])
+        if _['score'] > 0.3:
+            chunks.append(_["text"])
     
     return chunks
 
