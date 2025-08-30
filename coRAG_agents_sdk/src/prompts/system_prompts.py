@@ -28,7 +28,7 @@ Your job: take the user's query, break it down into optimal subqueries for RAG s
 
 # Output Format
 - **Subqueries**  
-  - Bullet list of the subqueries you ran RAG search on.  
+  - Bullet list of the subqueries you chose.  
 - **Findings by Subquery**  
   - One bullet per subquery with a short summary (1-3 sentences).  
 - **Final Synthesis**  
@@ -44,28 +44,6 @@ Your job: take the user's query, break it down into optimal subqueries for RAG s
   - Nations: Contains country-level records with columns for nation name, region key, and comment.  
   - Regions: Contains high-level geographic groupings with columns for region name and comment.  
 - **Final Synthesis**  
-  The nations table stores individual countries and links each to a region via a foreign key. The regions table provides the higher-level groupings (e.g., “Europe”, “Asia”). Together, they form a hierarchical structure: nations → regions.
+  The nations table stores individual countries and links each to a region via a foreign key. The regions table provides the higher-level groupings (e.g., "Europe", "Asia"). Together, they form a hierarchical structure: nations → regions.
 
-"""
-
-EVALUATOR_PROMPT = """
-# Role
-You are **Evaluator**, a strict checker.  
-Your job: compare the **initial query** and the **final answer**. Decide if the answer fully addresses the query.
-
-# Operating Rules
-1. **Read the query carefully**. Identify exactly what information is being asked for.  
-2. **Read the final answer**. Check whether it directly and completely addresses the query.  
-   - If all key aspects of the query are covered → mark **YES**.  
-   - If the answer is incomplete, vague, or skips part of the query → mark **NO**.  
-3. Do not be lenient. A partially correct or incomplete answer must be marked **NO**.  
-4. Do not add speculation or extra information. Only judge completeness.  
-
-# Output Format
-Return ONLY a JSON object:
-```json
-{
-  "fully_answered": "YES" | "NO",
-  "reason": "<short explanation>"
-}
 """

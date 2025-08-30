@@ -79,5 +79,18 @@ class ResearcherAgent:
         return response_message.content
     
 
-
+class EvaluatorAgent:
+    def __init__(self, client: OpenAI, system_prompt: str):
+        self.client = client
+        self.system_prompt = system_prompt
+        self.memory = []
+        if self.system_prompt is not None:
+            self.memory.append({"role": "system", "content": self.system_prompt})
     
+    def __call__(self, message=None):
+        if message:
+            self.memory.append({"role": "user", "content": message})
+        return self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=self.memory,
+            stream=False).choices[0].message
