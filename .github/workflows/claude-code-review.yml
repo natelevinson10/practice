@@ -1,0 +1,99 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    # Optional: Only run on specific file changes
+    # paths:
+    #   - "src/**/*.ts"
+    #   - "src/**/*.tsx"
+    #   - "src/**/*.js"
+    #   - "src/**/*.jsx"
+
+jobs:
+  claude-review:
+    # Optional: Filter by PR author
+    # if: |
+    #   github.event.pull_request.user.login == 'external-contributor' ||
+    #   github.event.pull_request.user.login == 'new-developer' ||
+    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+    
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: read
+      id-token: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4)
+          # model: "claude-opus-4-20250514"
+          
+          # Direct prompt for automated review (no @claude mention needed)
+          direct_prompt: |
+            Please review this pull request and provide feedback on:
+            - Code quality and best practices
+            - Potential bugs or issues
+            - Performance considerations
+            - Security concerns
+            - Test coverage
+            
+            Be constructive and helpful in your feedback.
+
+            Each major component/module directory contains its own README.md
+            Root directory contains project-wide README.md
+          
+            When reviewing code changes, ALWAYS check if documentation updates are needed and update both module-specific and root documentation as needed if the change affects:
+
+            1. Public APIs or interfaces - Update module README and potentially root README
+            2. Configuration requirements - Update setup sections in relevant READMEs  
+            3. New features or capabilities - Document new functionality and usage
+            4. Installation/setup procedures - Update installation guides
+            5. Module dependencies or data flow - Update architecture documentation
+            
+            Do not update documentation for:
+            - Minor bug fixes that don't change user-facing behavior
+            - Internal refactoring that doesn't affect public interfaces  
+            - Code cleanup that doesn't change functionality
+            - Any prototyping in jupyter notebooks within the notebooks directory
+
+            When documentation updates are needed:
+            1. Identify the affected module's README.md file
+            2. Update the relevant sections with clear, accurate information
+            3. Check if root README.md needs updates for project-wide changes
+            4. Ensure documentation stays current with code changes
+
+            Add a commit to the PR with the necessary documentation updates if needed ensuring the documentation stays up to date.
+
+          # Optional: Customize review based on file types
+          # direct_prompt: |
+          #   Review this PR focusing on:
+          #   - For TypeScript files: Type safety and proper interface usage
+          #   - For API endpoints: Security, input validation, and error handling
+          #   - For React components: Performance, accessibility, and best practices
+          #   - For tests: Coverage, edge cases, and test quality
+          
+          # Optional: Different prompts for different authors
+          # direct_prompt: |
+          #   ${{ github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' && 
+          #   'Welcome! Please review this PR from a first-time contributor. Be encouraging and provide detailed explanations for any suggestions.' ||
+          #   'Please provide a thorough code review focusing on our coding standards and best practices.' }}
+          
+          # Optional: Add specific tools for running tests or linting
+          # allowed_tools: "Bash(npm run test),Bash(npm run lint),Bash(npm run typecheck)"
+          
+          # Optional: Skip review for certain conditions
+          # if: |
+          #   !contains(github.event.pull_request.title, '[skip-review]') &&
+          #   !contains(github.event.pull_request.title, '[WIP]')
