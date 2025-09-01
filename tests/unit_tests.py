@@ -35,3 +35,6 @@ def test_divide():
     with pytest.raises(ZeroDivisionError):
         divide(1, 0)
 
+def fail_add_test():
+    assert add(2, 3) == 4
+
