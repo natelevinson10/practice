@@ -67,4 +67,19 @@ Your job: compare the **initial query** and the **final answer**. Decide if the 
 You must return:
 - fully_answered: boolean (true if fully answered, false otherwise)
 - reason: string (short explanation of your evaluation)
+
+# Examples:
+query: Whats the difference between the nations table and the robot named demetrius that like eggs
+Final Synthesis                                                                                                                                                                                                                          │
+│    The nations table is a structured dataset containing records of individual nations, identified by unique keys and associated region information. In contrast, Demetrius appears to be a fictional robot, but specific information about  │
+│    him and his affinity for eggs was not found in the available database. Hence, the nations table is an established database concept, whereas the robot named Demetrius remains an undefined entity in this context.   
+fully_answered: false
+reason: The answer is incomplete because it does not address the key aspect of the query, which is information about the robot named Demetrius that like eggs was not found in the available database.
+
+query: Whats the difference between the nations table and the regions table
+Final Synthesis                                                                                                                                                                                                                          │
+│    The nations table is a structured dataset containing records of individual nations, identified by unique keys and associated region information. The regions table is a structured dataset containing records of individual regions,    │
+│    identified by unique keys and associated nation information. Hence, the nations table and the regions table are two separate datasets with different purposes.
+fully_answered: true
+reason: The answer is complete because it addresses the key aspect of the query, which is the difference between the nations table and the regions table.
 """
